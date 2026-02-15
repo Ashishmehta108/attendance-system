@@ -36,6 +36,14 @@ Monorepo for real-time and post-class feedback: Express REST API, BullMQ worker 
 
 4. **Run**
 
+   **All at once (API + worker + web):**
+
+   ```bash
+   pnpm dev
+   ```
+
+   Or run separately:
+
    - API: `pnpm dev:api` (Express + WebSocket on port 3001)
    - Worker: `pnpm dev:worker` (BullMQ summarization)
    - Web: `pnpm dev:web` (Next.js on port 3000)
