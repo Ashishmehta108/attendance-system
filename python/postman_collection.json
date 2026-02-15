@@ -1,0 +1,157 @@
+{
+    "info": {
+        "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "Classroom AI Backend",
+        "description": "API collection for the Classroom Feedback Analyzer AI Microservice.\n\nBase URL: http://{{base_url}}/api/v1",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "127.0.0.1:8000",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Root",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://{{base_url}}/",
+                    "protocol": "http",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        ""
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Health Check",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://{{base_url}}/api/v1/health",
+                    "protocol": "http",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "health"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Analyze Feedback - Basic",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"session_id\": \"sess_demo_01\",\n    \"feedback\": [\n        \"The lecture was engaging but a bit fast.\",\n        \"I loved the examples used.\",\n        \"Could we have more time for questions?\",\n        \"The microphone volume was a bit low.\",\n        \"Great explanation of the core concepts.\"\n    ],\n    \"poll_stats\": {\n        \"understanding\": [4, 5, 3, 4, 5, 2, 4]\n    }\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://{{base_url}}/api/v1/analyze",
+                    "protocol": "http",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "analyze"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Analyze Feedback - Minimal",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"session_id\": \"sess_minimal\",\n    \"feedback\": [\n        \"Good class.\"\n    ]\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://{{base_url}}/api/v1/analyze",
+                    "protocol": "http",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "analyze"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Analyze Feedback - Invalid (Empty)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"session_id\": \"sess_invalid\",\n    \"feedback\": []\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://{{base_url}}/api/v1/analyze",
+                    "protocol": "http",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "analyze"
+                    ]
+                }
+            },
+            "response": []
+        }
+    ]
+}

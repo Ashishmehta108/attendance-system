@@ -1,0 +1,14 @@
+# Build output
+dist
+*.tsbuildinfo
+
+# Drizzle migrations (generated)
+drizzle/*.sql
+drizzle/.gitkeep
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log

@@ -1,0 +1,10 @@
+# Build output
+dist
+*.tsbuildinfo
+
+# Logs
+*.log
+
+# Testing
+coverage
+.nyc_output

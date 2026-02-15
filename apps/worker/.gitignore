@@ -1,0 +1,16 @@
+# Build output
+dist
+*.tsbuildinfo
+
+# Logs
+*.log
+logs
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Testing
+coverage
+.nyc_output

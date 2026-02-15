@@ -1,0 +1,32 @@
+{
+  "name": "@attendance-app/db",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "studio": "drizzle-kit studio",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@attendance-app/shared": "workspace:*",
+    "drizzle-orm": "^0.36.0",
+    "ioredis": "^5.4.1",
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.6",
+    "drizzle-kit": "^0.28.0",
+    "typescript": "^5.6.3"
+  }
+}

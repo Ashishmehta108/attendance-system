@@ -1,0 +1,9 @@
+fastapi==0.109.2
+uvicorn==0.27.1
+pydantic==2.6.1
+pydantic-settings==2.1.0
+onnxruntime-genai==0.2.0
+pytest==8.0.0
+httpx==0.26.0
+python-multipart==0.0.9
+huggingface_hub==0.20.3

@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Models (Too large for git)
+models/
+temp_download/
+
+# Database
+database.db
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+.pytest_cache/
