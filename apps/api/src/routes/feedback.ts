@@ -9,8 +9,12 @@ const router = Router({ mergeParams: true });
 
 router.use(requireSession);
 
-router.post("/:sessionId/feedback/realtime", requireRole("admin", "instructor", "student"), async (req: SessionRequest, res: Response) => {
+router.post("/:sessionId/feedback/realtime", requireRole("admin", "teacher", "student"), async (req: SessionRequest, res: Response) => {
   const { sessionId } = req.params;
+  if (!sessionId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId)) {
+    res.status(404).json({ error: "Session not found" });
+    return;
+  }
   const parsed = realtimeFeedbackSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.flatten() });
@@ -30,8 +34,12 @@ router.post("/:sessionId/feedback/realtime", requireRole("admin", "instructor", 
   res.status(201).json({ ok: true });
 });
 
-router.post("/:sessionId/feedback/post", requireRole("admin", "instructor", "student"), async (req: SessionRequest, res: Response) => {
+router.post("/:sessionId/feedback/post", requireRole("admin", "teacher", "student"), async (req: SessionRequest, res: Response) => {
   const { sessionId } = req.params;
+  if (!sessionId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId)) {
+    res.status(404).json({ error: "Session not found" });
+    return;
+  }
   const parsed = postClassFeedbackSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.flatten() });
@@ -47,7 +55,7 @@ router.post("/:sessionId/feedback/post", requireRole("admin", "instructor", "stu
     sessionId,
     userId,
     understandingLevel: parsed.data.understandingLevel,
-    comment: parsed.data.comment ?? null,
+    description: parsed.data.comment ?? null,
   });
   res.status(201).json({ ok: true });
 });

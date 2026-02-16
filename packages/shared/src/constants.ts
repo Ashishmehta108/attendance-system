@@ -7,5 +7,5 @@ export const SESSION_STATUS = ["active", "ended"] as const;
 export type SessionStatus = (typeof SESSION_STATUS)[number];
 
 /** RBAC roles */
-export const ROLES = ["admin", "instructor", "student"] as const;
+export const ROLES = ["admin", "teacher", "student"] as const;
 export type Role = (typeof ROLES)[number];

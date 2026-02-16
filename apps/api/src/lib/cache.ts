@@ -1,14 +1,10 @@
-import Redis from "ioredis";
+import { getRedisConnection } from "@attendance-app/db";
 
-const REDIS_URL = process.env.REDIS_URL ?? "redis://localhost:6379";
 const TTL_AGGREGATE = 60;
 const TTL_SUMMARY = 300;
 
-let client: Redis | null = null;
-
-function getClient(): Redis {
-  if (!client) client = new Redis(REDIS_URL);
-  return client;
+function getClient() {
+  return getRedisConnection();
 }
 
 const AGGREGATE_PREFIX = "agg:";

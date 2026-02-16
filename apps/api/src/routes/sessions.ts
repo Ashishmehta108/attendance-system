@@ -1,6 +1,6 @@
 import { Router, type Response } from "express";
 import { db, classSessions, realtimeFeedback, postClassFeedback } from "@attendance-app/db";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { SessionRequest } from "../middleware/session.js";
 import { requireSession, requireRole } from "../middleware/session.js";
 import { addSummarizationJob } from "../queues/summarization.js";
@@ -10,17 +10,24 @@ const router = Router({ mergeParams: true });
 
 router.use(requireSession);
 
-router.get("/:sessionId", requireRole("admin", "instructor", "student"), async (req: SessionRequest, res: Response) => {
-  const [row] = await db.select().from(classSessions).where(eq(classSessions.id, req.params.sessionId));
-  if (!row) {
+router.get("/:sessionId", requireRole("admin", "teacher", "student"), async (req: SessionRequest, res: Response) => {
+  const { sessionId } = req.params;
+  if (!sessionId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId)) {
     res.status(404).json({ error: "Session not found" });
     return;
   }
+  const [row] = await db.select().from(classSessions).where(eq(classSessions.id, sessionId));
   res.json(row);
 });
 
-router.patch("/:sessionId", requireRole("admin", "instructor"), async (req: SessionRequest, res: Response) => {
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+router.patch("/:sessionId", requireRole("admin", "teacher"), async (req: SessionRequest, res: Response) => {
   const { sessionId } = req.params;
+  if (!sessionId || !UUID_REGEX.test(sessionId)) {
+    res.status(404).json({ error: "Session not found" });
+    return;
+  }
   const [existing] = await db.select().from(classSessions).where(eq(classSessions.id, sessionId));
   if (!existing) {
     res.status(404).json({ error: "Session not found" });
@@ -38,8 +45,12 @@ router.patch("/:sessionId", requireRole("admin", "instructor"), async (req: Sess
   res.json(row!);
 });
 
-router.get("/:sessionId/aggregate", requireRole("admin", "instructor"), async (req: SessionRequest, res: Response) => {
+router.get("/:sessionId/aggregate", requireRole("admin", "teacher"), async (req: SessionRequest, res: Response) => {
   const { sessionId } = req.params;
+  if (!sessionId || !UUID_REGEX.test(sessionId)) {
+    res.status(404).json({ error: "Session not found" });
+    return;
+  }
   const cached = await getCachedAggregate(sessionId);
   if (cached) {
     res.json(cached);
@@ -55,7 +66,7 @@ router.get("/:sessionId/aggregate", requireRole("admin", "instructor"), async (r
     .from(realtimeFeedback)
     .where(eq(realtimeFeedback.sessionId, sessionId));
   const postRows = await db
-    .select({ understandingLevel: postClassFeedback.understandingLevel, comment: postClassFeedback.comment })
+    .select({ understandingLevel: postClassFeedback.understandingLevel, description: postClassFeedback.description })
     .from(postClassFeedback)
     .where(eq(postClassFeedback.sessionId, sessionId));
 
@@ -68,7 +79,7 @@ router.get("/:sessionId/aggregate", requireRole("admin", "instructor"), async (r
       levelCounts[p.understandingLevel as 1 | 2 | 3 | 4 | 5]++;
   }
   const sampleThemes = postRows
-    .map((p) => p.comment)
+    .map((p) => p.description)
     .filter((c): c is string => typeof c === "string" && c.length > 0)
     .slice(0, 10);
 

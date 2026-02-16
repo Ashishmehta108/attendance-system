@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm exec concurrently -n api,worker,web -c blue,magenta,green \"pnpm --filter api dev\" \"pnpm --filter worker dev\" \"pnpm --filter web dev\"",
+    "dev": "pnpm exec concurrently -n api,web -c blue,magenta,green \"pnpm --filter api dev\"  \"pnpm --filter web dev\"",
     "dev:api": "pnpm --filter api dev",
     "dev:web": "pnpm --filter web dev",
     "dev:worker": "pnpm --filter worker dev",

@@ -15,8 +15,9 @@ export default function HomePage() {
       return;
     }
     const role = (session.user as { role?: string }).role ?? "student";
-    if (role === "admin" || role === "instructor") router.push("/dashboard");
-    else router.push("/sessions");
+    if (role === "admin") router.push("/admin");
+    else if (role === "teacher") router.push("/teacher");
+    else router.push("/student");
   }, [session, isPending, router]);
 
   return <div className="min-h-screen flex items-center justify-center">Loading…</div>;

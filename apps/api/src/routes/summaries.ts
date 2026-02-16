@@ -9,7 +9,7 @@ const router = Router({ mergeParams: true });
 
 router.use(requireSession);
 
-router.get("/:sessionId/summary", requireRole("admin", "instructor"), async (req: SessionRequest, res: Response) => {
+router.get("/:sessionId/summary", requireRole("admin", "teacher"), async (req: SessionRequest, res: Response) => {
   const { sessionId } = req.params;
   const cached = await getCachedSummary(sessionId);
   if (cached) {

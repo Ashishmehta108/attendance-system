@@ -12,6 +12,7 @@
     "@attendance-app/db": "workspace:*",
     "@attendance-app/shared": "workspace:*",
     "bullmq": "^5.25.0",
+    "drizzle-orm": "^0.45.1",
     "ioredis": "^5.4.1"
   },
   "devDependencies": {

@@ -6,11 +6,13 @@ export async function api<T>(
 ): Promise<T> {
   const { params, ...init } = options ?? {};
   const url = params ? `${API_URL}${path}?${new URLSearchParams(params)}` : `${API_URL}${path}`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const res = await fetch(url, {
     ...init,
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
       ...init.headers,
     },
   });

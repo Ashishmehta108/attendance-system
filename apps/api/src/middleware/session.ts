@@ -1,50 +1,107 @@
 import type { Request, Response, NextFunction } from "express";
-import { fromNodeHeaders } from "better-auth/node";
-import { auth } from "../auth.js";
+import { verifyToken } from "../auth/jwt.js";
 
-export interface SessionRequest extends Request {
-  session?: Awaited<ReturnType<typeof auth.api.getSession>>;
-}
-
-export async function sessionMiddleware(
-  req: SessionRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    const session = await auth.api.getSession({
-      headers: fromNodeHeaders(req.headers),
-    });
-    req.session = session ?? undefined;
-    next();
-  } catch {
-    next();
+// Extend Express Request interface
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        role: string;
+      };
+      session?: {
+        user: {
+          id: string;
+          role: string;
+        };
+        session: {
+          id: string;
+          userId: string;
+          expiresAt: Date;
+        }
+      } | null;
+    }
   }
 }
 
-export function requireSession(
-  req: SessionRequest,
+export type SessionRequest = Request;
+
+export const authenticate = async (
+  req: Request,
   res: Response,
   next: NextFunction
-): void {
-  if (!req.session?.user) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
+) => {
+  try {
+    const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      req.user = undefined;
+      req.session = null;
+      return next();
+    }
+
+    const payload = verifyToken(token);
+
+    if (!payload) {
+      req.user = undefined;
+      req.session = null;
+      return next();
+    }
+
+    req.user = {
+      id: payload.userId,
+      role: payload.role,
+    };
+
+    // Compatibility for existing code relying on req.session
+    req.session = {
+      user: {
+        id: payload.userId,
+        role: payload.role,
+      },
+      session: {
+        id: "jwt-session",
+        userId: payload.userId,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    };
+
+    next();
+  } catch (error) {
+    console.error("Auth middleware error:", error);
+    req.user = undefined;
+    req.session = null;
+    next();
+  }
+};
+
+export const requireAuth = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
   next();
-}
+};
 
 export function requireRole(...roles: string[]) {
-  return (req: SessionRequest, res: Response, next: NextFunction): void => {
-    if (!req.session?.user) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.user) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
-    const role = (req.session.user as { role?: string }).role ?? "student";
-    if (!roles.includes(role)) {
+
+    // Check if user's role is in the allowed roles
+    if (!roles.includes(req.user.role)) {
       res.status(403).json({ error: "Forbidden" });
       return;
     }
     next();
   };
 }
+
+// Compatibility layer for existing code that uses sessionMiddleware
+export const sessionMiddleware = authenticate;
+export const requireSession = requireAuth;
